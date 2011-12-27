@@ -74,8 +74,12 @@ config.int: config.c0d .PHONY
 initanim.int: initanim.c0d .PHONY
 	mv $< $@
 
+release:
+	mkdir -p release
+	mv *.c0d *.nik release
+
 clean:
-	rm -f *.o *.elf *.bin usetable.h
+	rm -f *.o *.elf *.bin usetable.h *.nik *.c0d
 
 $(OBJS): usetable.h
 

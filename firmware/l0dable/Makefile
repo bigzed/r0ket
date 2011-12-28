@@ -75,8 +75,10 @@ initanim.int: initanim.c0d .PHONY
 	mv $< $@
 
 release:
+	make
 	mkdir -p release
 	mv *.c0d *.nik release
+	make clean
 
 clean:
 	rm -f *.o *.elf *.bin usetable.h *.nik *.c0d

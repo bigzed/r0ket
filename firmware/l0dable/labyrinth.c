@@ -113,7 +113,7 @@ void generate_matrix(bool[24][17]s matrix){
   char direct = 4;
   for(i=0; i<5; i++){
     while(free){
-      while((direct==org){
+      while(direct==org){
         direct = getRandom%4;
       }
       if(direct==0) y = y-1%17;

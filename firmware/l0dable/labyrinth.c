@@ -9,7 +9,7 @@
 #include "lcd/display.h"
 
 #include "lcd/fonts.h"
-#include "lcd/fonts/labyrinthpixelart4.h"
+#include "lcd/fonts/labyrinth.h"
 
 #include "usetable.h"
 

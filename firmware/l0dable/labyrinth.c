@@ -116,7 +116,7 @@ bool screen_intro() {
     lcdFill(0);
     DoString(16,40,"LABYRINTH");
     lcdDisplay();
-    getInputWaitTimeout(5000);
+    key = getInputWaitTimeout(5000);
   }
   return !(key == BTN_LEFT);
 }

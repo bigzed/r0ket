@@ -19,6 +19,10 @@
 /**************************************************************************/
 #define BLOCK_SIZE 4
 
+//coords
+//#define ZERO_X -8;
+//#define ZERO_Y -5;
+
 //sprite types
 #define TYPE_FLOOR 0
 #define TYPE_PLAYER 1
@@ -88,7 +92,6 @@ void ram(void) {
       move_player();
       lcdFill(0);
       draw_matrix();
-      lcdDisplay();
       delayms(100);
       //------------
     }while(getInputRaw() != BTN_ENTER); 
@@ -227,6 +230,7 @@ void orientate_player(){
       player.player_char = (player.arm_state == 0)? LEFTLA:LEFTRA;
       break;
     case RIGHT:
+
       player.player_char = (player.arm_state == 0)? RIGHTLA:RIGHTRA;
       break;
     case UP:
@@ -246,13 +250,18 @@ void update_matrix(char type, uint32_t x, uint32_t y){
 /*draw all things */
 
 void draw_matrix(){
-  uint8_t i,j;
+//  uint8_t i,j;
   font = &Font_Labyrinth;
   lcdFill(0);
-  for(i=0; i<24; i++){
-    for(j=0; j<17; j++){
-      DoChar(i*BLOCK_SIZE, j*BLOCK_SIZE, matrix[i][j]);
-    }
+// for(i=0; i<24; i++){
+//    for(j=0; j<17; j++){
+//      DoChar(i*BLOCK_SIZE, j*BLOCK_SIZE, matrix[i][j    DoChar(j*4,0, 'P');
+//]);
+//    }
+//  }
+  int j;
+  for(j=0; j<24; ++j) {
+    DoChar(j*4,0, 'P');
   }
 }
 #include "lcd/fonts/labyrinth.c"

@@ -1,4 +1,4 @@
-PIXEL_SIZE 3
+PIXEL_SIZE 4
 FACE_NAME "Labyrinth Pixel Art"
 COPYRIGHT "Labyrinth Pixel Art"
 FAMILY_NAME "Labyrinth"
@@ -15,27 +15,82 @@ ENDCHAR
 STARTCHAR pstill
 ENCODING 80
 XBITMAP
-...
-xxx
-xxx
+....
+xxxx
+xxxx
+....
 ENDCHAR
 
-STARTCHAR pleft
+STARTCHAR ptleft
 ENCODING 81
 XBITMAP
-x..
-xxx
-xxx
+x...
+xxxx
+xxxx
+....
 ENDCHAR
 
-STARTCHAR pright
+STARTCHAR ptright
 ENCODING 82
 XBITMAP
-..x
-xxx
-xxx
+...x
+xxxx
+xxxx
+....
 ENDCHAR
 
-STARTCHAR 
+STARTCHAR pbleft
+ENCODING 83
+XBITMAP
+....
+xxxx
+xxxx
+...x
+ENDCHAR
+
+STARTCHAR pbright
+ENCODING 84
+XBITMAP
+....
+xxxx
+xxxx
+x...
+ENDCHAR
+
+STARTCHAR plleft
+ENCODING 85
+XBITMAP
+.xx.
+.xx.
+.xx.
+xxx.
+ENDCHAR
+
+STARTCHAR plright
+ENDFONT 86
+XBITMAP
+xxx.
+.xx.
+.xx.
+.xx.
+ENDCHAR
+
+STARTCHAR prleft
+ENDFONT 87
+XBITMAP
+.xxx
+.xx.
+.xx.
+.xx.
+ENDCHAR
+
+STARTCHAR prright
+ENDFONT 88
+XBITMAP
+.xx.
+.xx.
+.xx.
+.xxx
+ENDCHAR
 
 ENDFONT

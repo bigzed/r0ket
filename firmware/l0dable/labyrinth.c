@@ -54,10 +54,19 @@
 #define LRig 7
 #define RRig 8
 
+void init();
+void init_player();
+bool screen_intro();
+bool screen_gameover();
+void generate_matrix();
+void move_player();
+void orientate_player();
+void draw_matrix();
+
 struct playerstate {
   char orientation;
   char arm_state;
-  char posX, posY;
+  uint8_t posX, posY;
   char player_char;
 } player;
 
@@ -71,7 +80,7 @@ void ram(void) {
     if (!screen_intro())
       return;
       /* game */
-      matrix = generate_matrix;
+      generate_matrix();
       do {
         lcdFill(0);
         //------------
@@ -80,7 +89,7 @@ void ram(void) {
         //------------
         lcdDisplay();
         delayms(12);
-      }while(gpioGetValue(RB_BTN4)!=0) 
+      }while(gpioGetValue(RB_BTN4)!=0); 
     /* exit */
 		if (!screen_gameover())
 			return;
@@ -107,7 +116,7 @@ bool screen_intro() {
     lcdFill(0);
     DoString(16,40,"LABYRINTH");
     lcdDisplay();
-    getInputWaitTimeout(5000)
+    getInputWaitTimeout(5000);
   }
   return !(key == BTN_LEFT);
 }
@@ -125,27 +134,28 @@ bool screen_gameover() {
 
 /* actual game code */
 
-void generate_matrix(char[24][17] matrix){
+void generate_matrix(){
+  uint8_t i,j;
   for(i=0; i<24; i++){
     for(j=0; j<17; j++){
       matrix[i][j] = 'w';
     }
   }
   bool free = true;
-  char x = 1;
-  char y = 1;
+  uint32_t x = 1;
+  uint32_t y = 1;
   char org = 4; //no origin
   char direct = 4;
   for(i=0; i<=WAYS_AMOUNT; i++){
     while(free){
       while(direct==org){
-        direct = getRandom%4;
+        direct = getRandom()%4;
       }
       if(direct==0) y = y-1%17;
       if(direct==1) x = x+1%24;
       if(direct==2) y = y+1%17;
       if(direct==3) y = y+1%24;
-      if(matrix[x][y] == false){
+      if(matrix[x][y] == 'w'){
         matrix[x][y] = 'f';
       }
       else{
@@ -158,9 +168,8 @@ void generate_matrix(char[24][17] matrix){
 }
 
 void move_player() {
-  char orientation = NO_ORIENTATION;
-  char newX = player.posX;
-  char newY = player.posY;
+  uint32_t newX = player.posX;
+  uint32_t newY = player.posY;
   if(gpioGetValue(RB_BTN0)==0 && player.posX>0)
     newX-=1;
     player.orientation = LEFT;
@@ -188,7 +197,7 @@ void move_player() {
 void orientate_player(){
   switch(player.orientation) {
     case NO_ORIENTATION:
-      player_char = 'P';
+      player.player_char = 'P';
       break;
     case LEFT:
       player.player_char = player.arm_state?'V':'U';
@@ -211,6 +220,7 @@ void orientate_player(){
 /*draw all things */
 
 void draw_matrix(){
+  uint8_t i,j;
   font = &Font_Labyrinth;
   lcdFill(0);
   for(i=0; i<24; i++){
@@ -219,3 +229,4 @@ void draw_matrix(){
     }
   }
 }
+#include "lcd/fonts/labyrinth.c"

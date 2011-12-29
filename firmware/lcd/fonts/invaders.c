@@ -1,6 +1,6 @@
 #include "invaders.h"
 
-/* Font data for Invaders */
+/* Font data for Labyrinth */
 
 /* Space Invaders Pixel Art
  */

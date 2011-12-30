@@ -43,7 +43,8 @@
 //matrix definitions
 #define WAYS_AMOUNT 4
 
-//player orientations
+/* sprites */
+//player orientations, direction + left/right arm
 #define CENTRAL 'P'
 #define UPLA 'Q'
 #define UPRA 'R'
@@ -85,8 +86,8 @@ void ram(void) {
     do {
       //------------
       move_player();
-      lcdClear();
-      lcdPrintln(player.player_char);
+      lcdFill(0);
+      draw_matrix();
       lcdDisplay();
       delayms(100);
       //------------
@@ -138,7 +139,7 @@ bool screen_gameover() {
   lcdFill(0);
   font = &Font_7x8;
 	DoString (14,24, "GAME OVER");
-	DoString (12,32, "enter: again");
+	DoString (10,32, "enter: again");
 	DoString (14,40, "left: exit");
 	lcdDisplay();
 	delayms(500);
@@ -207,15 +208,14 @@ void move_player() {
   }
   
   if(matrix[newX][newY] == 'f'){
+    update_matrix(player.posX,player.posY,'f');
     player.posX = newX;
     player.posY = newY;
     player.arm_state = player.arm_state+1%2;
   }
-  
-  orientate_player();
   update_matrix(player.player_char, player.posX, player.posY);
+  orientate_player();
   
-  lcdPrintln(player.player_char);
 }
 
 void orientate_player(){
@@ -224,16 +224,16 @@ void orientate_player(){
       player.player_char = 'P';
       break;
     case LEFT:
-      player.player_char = player.arm_state? LEFTLA:LEFTRA;
+      player.player_char = (player.arm_state == 0)? LEFTLA:LEFTRA;
       break;
     case RIGHT:
-      player.player_char = player.arm_state? RIGHTLA:RIGHTRA;
+      player.player_char = (player.arm_state == 0)? RIGHTLA:RIGHTRA;
       break;
     case UP:
-      player.player_char = player.arm_state? UPLA:UPRA;
+      player.player_char = (player.arm_state == 0)? UPLA:UPRA;
       break;
     case DOWN:
-      player.player_char = player.arm_state? DOWNLA:DOWNRA;
+      player.player_char = (player.arm_state == 0)? DOWNLA:DOWNRA;
       break;
   }
 }
@@ -251,7 +251,7 @@ void draw_matrix(){
   lcdFill(0);
   for(i=0; i<24; i++){
     for(j=0; j<17; j++){
-      DoChar(matrix[i][j], i*BLOCK_SIZE, j*BLOCK_SIZE);
+      DoChar(i*BLOCK_SIZE, j*BLOCK_SIZE, matrix[i][j]);
     }
   }
 }

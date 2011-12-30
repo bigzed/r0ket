@@ -37,22 +37,22 @@
 #define ARM_NONE 2
 
 //player start position
-#define START_X 1
-#define START_Y 1
+#define START_X 10
+#define START_Y 5
 
 //matrix definitions
 #define WAYS_AMOUNT 4
 
 //player orientations
-#define NORMAL 0
-#define LTop 1
-#define RTop 2
-#define LBot 3
-#define RBot 4
-#define LLef 5
-#define RLef 6
-#define LRig 7
-#define RRig 8
+#define CENTRAL 'P'
+#define UPLA 'Q'
+#define UPRA 'R'
+#define DOWNLA 'S'
+#define DOWNRA 'T'
+#define LEFTLA 'U'
+#define LEFTRA 'V'
+#define RIGHTLA 'W'
+#define RIGHTRA 'X'
 
 void init();
 void init_player();
@@ -61,6 +61,7 @@ bool screen_gameover();
 void generate_matrix();
 void move_player();
 void orientate_player();
+void update_matrix(char type, uint32_t, uint32_t);
 void draw_matrix();
 
 struct playerstate {
@@ -74,22 +75,22 @@ char matrix[24][17];
 
 void ram(void) {
   while(true) {
-    /* initialize */
-	  init();
+    
 	  /* intro */
     if (!screen_intro())
       return;
-      /* game */
-      generate_matrix();
-      do {
-        lcdFill(0);
-        //------------
-        move_player();
-        draw_matrix();
-        //------------
-        lcdDisplay();
-        delayms(12);
-      }while(gpioGetValue(RB_BTN4)!=0); 
+    /* initialize */
+    init();
+    /* game */
+    do {
+      //------------
+      move_player();
+      lcdClear();
+      lcdPrintln(player.player_char);
+      lcdDisplay();
+      delayms(100);
+      //------------
+    }while(getInputRaw() != BTN_ENTER); 
     /* exit */
 		if (!screen_gameover())
 			return;
@@ -98,7 +99,10 @@ void ram(void) {
 
 /* initialize all the things */
 void init() {
+  generate_matrix();
   init_player();
+  draw_matrix();
+  delayms(500);
 }
 
 void init_player() {
@@ -107,29 +111,43 @@ void init_player() {
   player.posX = START_X;
   player.posY = START_Y;
   player.player_char = 'P';
+  update_matrix('P', START_X, START_Y);
 }
 
 /* different screens */
 bool screen_intro() {
-  char key = BTN_NONE;
-  while(key == BTN_NONE){
-    lcdFill(0);
-    DoString(16,40,"LABYRINTH");
-    lcdDisplay();
-    key = getInputWaitTimeout(5000);
-  }
-  return !(key == BTN_LEFT);
+  lcdFill(0);
+  font = &Font_7x8;
+  DoString(16,40,"LABYRINTH");
+  lcdDisplay();
+  delayms(500);
+  char key;
+  while(key = getInputWaitTimeout(5000))
+  if(key == BTN_LEFT){
+    delayms(500);
+    return 0;
+	}
+	else if(key == BTN_ENTER) {
+    return 1;
+    delayms(500);
+	}
+	return 1;
 }
 
 bool screen_gameover() {
-	char key = BTN_NONE;
-	while(key == BTN_NONE) {
-    lcdFill(0);
-		DoString (14,32, "GAME OVER");
-		lcdDisplay();
-		key=getInputWaitTimeout(5000);
+  lcdFill(0);
+  font = &Font_7x8;
+	DoString (14,24, "GAME OVER");
+	DoString (12,32, "enter: again");
+	DoString (14,40, "left: exit");
+	lcdDisplay();
+	delayms(500);
+	if(getInputWaitTimeout(5000) == BTN_LEFT){
+	  return 0;
 	}
-	return !(key==BTN_LEFT);
+	else {
+    return 1;
+	}
 }
 
 /* actual game code */
@@ -138,50 +156,55 @@ void generate_matrix(){
   uint8_t i,j;
   for(i=0; i<24; i++){
     for(j=0; j<17; j++){
-      matrix[i][j] = 'w';
+      matrix[i][j] = 'f';
     }
   }
-  bool free = true;
-  uint32_t x = 1;
-  uint32_t y = 1;
-  char org = 4; //no origin
-  char direct = 4;
-  for(i=0; i<=WAYS_AMOUNT; i++){
-    while(free){
-      while(direct==org){
-        direct = getRandom()%4;
-      }
-      if(direct==0) y = y-1%17;
-      if(direct==1) x = x+1%24;
-      if(direct==2) y = y+1%17;
-      if(direct==3) y = y+1%24;
-      if(matrix[x][y] == 'w'){
-        matrix[x][y] = 'f';
-      }
-      else{
-        break;
-      }
-    }
-    x = getRandom()%24;
-    y = getRandom()%17;
-  }
+/*  bool free = true;*/
+/*  uint32_t x = 1;*/
+/*  uint32_t y = 1;*/
+/*  char org = 4; //no origin*/
+/*  char direct = 4;*/
+/*  for(i=0; i<=WAYS_AMOUNT; i++){*/
+/*    while(free){*/
+/*      while(direct==org){*/
+/*        direct = getRandom()%4;*/
+/*      }*/
+/*      if(direct==0) y = y-1%17;*/
+/*      if(direct==1) x = x+1%24;*/
+/*      if(direct==2) y = y+1%17;*/
+/*      if(direct==3) y = y+1%24;*/
+/*      if(matrix[x][y] == 'w'){*/
+/*        matrix[x][y] = 'f';*/
+/*      }*/
+/*      else{*/
+/*        break;*/
+/*      }*/
+/*    }*/
+/*    x = getRandom()%24;*/
+/*    y = getRandom()%17;*/
+/*  }*/
 }
 
 void move_player() {
   uint32_t newX = player.posX;
   uint32_t newY = player.posY;
-  if(gpioGetValue(RB_BTN0)==0 && player.posX>0)
+  char key = getInputWaitTimeout(20);
+  if(key == BTN_LEFT && player.posX>0){
     newX-=1;
     player.orientation = LEFT;
-  if(gpioGetValue(RB_BTN1)==0 && player.posX<12)
+  }
+  if(key == BTN_RIGHT && player.posX<24){
     newX+=1;
     player.orientation = RIGHT;
-  if(gpioGetValue(RB_BTN2)==0 && player.posY>0)
+  }
+  if(key == BTN_UP && player.posY>0){
     newY-=1;
     player.orientation = UP;
-  if(gpioGetValue(RB_BTN3)==0 && player.posY<17)
+  }
+  if(key == BTN_DOWN && player.posY<17){
     newY+=1;
     player.orientation = DOWN;
+  }
   
   if(matrix[newX][newY] == 'f'){
     player.posX = newX;
@@ -190,8 +213,9 @@ void move_player() {
   }
   
   orientate_player();
+  update_matrix(player.player_char, player.posX, player.posY);
   
-  matrix[player.posX][player.posY] = player.player_char;
+  lcdPrintln(player.player_char);
 }
 
 void orientate_player(){
@@ -200,21 +224,23 @@ void orientate_player(){
       player.player_char = 'P';
       break;
     case LEFT:
-      player.player_char = player.arm_state?'V':'U';
+      player.player_char = player.arm_state? LEFTLA:LEFTRA;
       break;
     case RIGHT:
-      player.player_char = player.arm_state?'X':'W';
+      player.player_char = player.arm_state? RIGHTLA:RIGHTRA;
       break;
     case UP:
-      player.player_char = player.arm_state?'R':'Q';
+      player.player_char = player.arm_state? UPLA:UPRA;
       break;
     case DOWN:
-      player.player_char = player.arm_state?'T':'S';
+      player.player_char = player.arm_state? DOWNLA:DOWNRA;
       break;
   }
 }
 
-
+void update_matrix(char type, uint32_t x, uint32_t y){
+  matrix[x][y] = type;
+}
 
 
 /*draw all things */
